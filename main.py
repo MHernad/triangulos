@@ -17,7 +17,6 @@ pygame.display.flip()
 _exec = True
 
 while _exec:
-    clock.tick(60)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
@@ -25,10 +24,14 @@ while _exec:
     w = int(input("width: "))
     h = int(input("height: "))
     grid = []
+    dots_h = []
+    dots = []
 
     for _w in range(w):
         for _h in range(h):
-            pygame.draw.circle(screen, black, (_w * (300 / w) + 10, _h * (300 / h) + 10), 2)
+            _dot = pygame.draw.circle(screen, (0, 0, 0), (_w * (300 / w) + 10, _h * (300 / h) + 10), 2)
+            dots_h.append(_dot)
+        dots.append(dots_h)
 
     pygame.display.update()
 
@@ -184,7 +187,7 @@ while _exec:
     p1 = Punto(int(input("coordenada x del punto ")), int(input("coordenada y del punto ")))
 
     grid[h - p1.y - 1][p1.x] = "X"
-    pygame.draw.circle(screen, (255, 0, 0), (p1.x * (350 / p1.x) + 10, p1.y * (350 / p1.y) + 10), 3)
+    pygame.draw.circle(screen, (255, 0, 0), (p1.x * (300 / w) + 10, (h-p1.y-1) * (300 / h) + 10), 3)
 
     pygame.display.update()
 
@@ -200,6 +203,8 @@ while _exec:
             print("No puede seleccionar el mismo punto para evitar que el que usa para buscar")
             continue
         puntosAEvitar.add(auxP)
+        pygame.draw.circle(screen, (255, 255, 255), (auxP.x * (300 / w) + 10, auxP.y * (300 / h) + 10), 2)
+        pygame.display.flip()
         res = input("Continuar? S/N: ")
 
     buscar_todos_los_triangulos(p1, h, w, setTriangulos, puntosAEvitar)
