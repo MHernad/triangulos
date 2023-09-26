@@ -23,10 +23,12 @@ while True:
     dots_h = []
     dots = []
 
+
     def dibujar_grilla():
         for _w in range(w):
             for _h in range(h):
                 pygame.draw.circle(screen, (0, 0, 0), (_w * (300 / w) + 10, _h * (300 / h) + 10), 2)
+
 
     dibujar_grilla()
 
@@ -38,6 +40,7 @@ while True:
     for i in range(w):
         for j in range(h):
             grid[j].append(".")
+
 
     # Clase punto
 
@@ -54,6 +57,7 @@ while True:
 
         def __str__(self):
             return "{x}, {y}".format(x=self.x, y=self.y)
+
 
     # Clase triangulo
 
@@ -128,6 +132,7 @@ while True:
         grid[h - _p3.y - 1][_p3.x] = "."
         grid[h - _p2.y - 1][_p2.x] = "."
 
+
     colores = [
         (255, 0, 0),
         (0, 255, 0),
@@ -139,14 +144,15 @@ while True:
         (255, 102, 255)
     ]
 
+
     def lineas_para_triangulo(_p1, _p2, c):
-        while c > len(colores)-1:
-            c = c - len(colores)-1
+        while c > len(colores) - 1:
+            c = c - len(colores) - 1
         pygame.draw.line(screen, colores[c], (_p1.x * (300 / w) + 10, (h - _p1.y - 1) * (300 / h) + 10),
                          (_p2.x * (300 / w) + 10, (h - _p2.y - 1) * (300 / h) + 10), 2)
 
 
-    def buscar_todos_los_triangulos(_p1, _h, _w, _setTriangulos, listaPuntosEvitar):
+    def buscar_todos_los_triangulos(p1, _h, _w, _setTriangulos, listaPuntosEvitar):
         color = 0
         for y2 in range(_h):
             for x2 in range(_w):
@@ -160,8 +166,8 @@ while True:
                         p2 = Punto(x2, y2)
                         p3 = Punto(x3, y3)
 
-                        mAB = calcular_pendiente(_p1, p3)
-                        mAC = calcular_pendiente(_p1, p2)
+                        mAB = calcular_pendiente(p1, p3)
+                        mAC = calcular_pendiente(p1, p2)
                         mBC = calcular_pendiente(p2, p3)
 
                         aX = calcular_angulos(mAB, mAC)
@@ -172,7 +178,7 @@ while True:
                         listaAngulos = verificar_angulos(listaAngulos)
 
                         if listaAngulos.count(90) == 1 and listaAngulos.count(0) == 0:
-                            __t = Triangulo(_p1, p2, p3)
+                            __t = Triangulo(p1, p2, p3)
                             flag = triangulos_repetidos(_setTriangulos, __t)
                             if flag:
                                 del __t
@@ -187,7 +193,7 @@ while True:
                                 actualizar_grilla()
 
                                 pygame.display.flip()
-                                mostrar_triangulos(_p1, p2, p3)
+                                mostrar_triangulos(p1, p2, p3)
                                 _setTriangulos.add(__t)
 
                         del p2
@@ -209,12 +215,9 @@ while True:
         return False
 
 
-    p1 = Punto(int(input("coordenada x del punto ")), int(input("coordenada y del punto ")))
-
-    grid[h - p1.y - 1][p1.x] = "X"
-    pygame.draw.circle(screen, (255, 0, 0), (p1.x * (300 / w) + 10, (h-p1.y-1) * (300 / h) + 10), 3)
-
-    pygame.display.update()
+    # p1 = Punto(int(input("coordenada x del punto ")), int(input("coordenada y del punto ")))
+    # pygame.draw.circle(screen, (255, 0, 0), (p1.x * (300 / w) + 10, (h-p1.y-1) * (300 / h) + 10), 3)
+    # pygame.display.update()
 
     for _u in range(h):
         print(grid[_u])
@@ -222,22 +225,32 @@ while True:
     puntosAEvitar = set()
 
     res = input("Evitar puntos en la grilla? S/N: ")
+
     while res.capitalize() == "S":
         auxP = Punto(int(input("coordenada x del punto ")), int(input("coordenada y del punto ")))
-        if auxP == p1:
-            print("No puede seleccionar el mismo punto para evitar que el que usa para buscar")
-            continue
+        # if auxP == p1:
+        #    print("No puede seleccionar el mismo punto para evitar que el que usa para buscar")
+        #    continue
         puntosAEvitar.add(auxP)
+
 
         def actualizar_grilla():
             dibujar_grilla()
             pygame.draw.circle(screen, (255, 255, 255), (auxP.x * (300 / w) + 10, (h - auxP.y - 1) * (300 / h) + 10), 2)
 
+
         actualizar_grilla()
         pygame.display.flip()
         res = input("Continuar? S/N: ")
 
-    buscar_todos_los_triangulos(p1, h, w, setTriangulos, puntosAEvitar)
+    for _y in range(h):
+        for _x in range(w):
+            _p = Punto(_x, _y)
+            if _p in puntosAEvitar:
+                del _p
+                continue
+            buscar_todos_los_triangulos(_p, h, w, setTriangulos, puntosAEvitar)
+            del _p
 
     f = open("triangulos.txt", "w")
     for t in setTriangulos:
