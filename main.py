@@ -131,8 +131,26 @@ while _exec:
         grid[h - _p3.y - 1][_p3.x] = "."
         grid[h - _p2.y - 1][_p2.x] = "."
 
+    colores = [
+        (255, 0, 0),
+        (0, 255, 0),
+        (0, 0, 255),
+        (0, 255, 255),
+        (255, 255, 0),
+        (255, 0, 255),
+        (153, 51, 255),
+        (255, 102, 255)
+    ]
+
+    def lineas_para_triangulo(_p1, _p2, c):
+        while c > len(colores)-1:
+            c = c - len(colores)-1
+        pygame.draw.line(screen, colores[c], (_p1.x * (300 / w) + 10, (h - _p1.y - 1) * (300 / h) + 10),
+                         (_p2.x * (300 / w) + 10, (h - _p2.y - 1) * (300 / h) + 10))
+
 
     def buscar_todos_los_triangulos(_p1, _h, _w, _setTriangulos, listaPuntosEvitar):
+        color = 0
         for y2 in range(_h):
             for x2 in range(_w):
                 if Punto(x2, y2) in listaPuntosEvitar:
@@ -162,6 +180,15 @@ while _exec:
                             if flag:
                                 del __t
                             else:
+                                color += 1
+                                lineas_para_triangulo(p1, p2, color)
+                                lineas_para_triangulo(p1, p3, color)
+                                lineas_para_triangulo(p2, p3, color)
+                                pygame.display.flip()
+                                pygame.time.wait(1000)
+                                screen.fill((255, 255, 255))
+
+                                pygame.display.flip()
                                 mostrar_triangulos(_p1, p2, p3)
                                 _setTriangulos.add(__t)
 
