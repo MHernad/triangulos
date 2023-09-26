@@ -1,4 +1,7 @@
 Para hacer:
-	- Que se mantenga la grilla cuando se reinician los triangulos
 	- Input en pantalla
 	- Grilla con espaciado dinamico
+	
+	
+	
+	

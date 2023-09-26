@@ -14,12 +14,8 @@ pygame.display.flip()
 
 # Crea la planilla sobre la que se buscaran los triangulos
 
-_exec = True
-
-while _exec:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
+while True:
+    pygame.event.pump()
 
     w = int(input("width: "))
     h = int(input("height: "))
@@ -27,11 +23,12 @@ while _exec:
     dots_h = []
     dots = []
 
-    for _w in range(w):
-        for _h in range(h):
-            _dot = pygame.draw.circle(screen, (0, 0, 0), (_w * (300 / w) + 10, _h * (300 / h) + 10), 2)
-            dots_h.append(_dot)
-        dots.append(dots_h)
+    def dibujar_grilla():
+        for _w in range(w):
+            for _h in range(h):
+                pygame.draw.circle(screen, (0, 0, 0), (_w * (300 / w) + 10, _h * (300 / h) + 10), 2)
+
+    dibujar_grilla()
 
     pygame.display.update()
 
@@ -146,7 +143,7 @@ while _exec:
         while c > len(colores)-1:
             c = c - len(colores)-1
         pygame.draw.line(screen, colores[c], (_p1.x * (300 / w) + 10, (h - _p1.y - 1) * (300 / h) + 10),
-                         (_p2.x * (300 / w) + 10, (h - _p2.y - 1) * (300 / h) + 10))
+                         (_p2.x * (300 / w) + 10, (h - _p2.y - 1) * (300 / h) + 10), 2)
 
 
     def buscar_todos_los_triangulos(_p1, _h, _w, _setTriangulos, listaPuntosEvitar):
@@ -187,6 +184,7 @@ while _exec:
                                 pygame.display.flip()
                                 pygame.time.wait(1000)
                                 screen.fill((255, 255, 255))
+                                actualizar_grilla()
 
                                 pygame.display.flip()
                                 mostrar_triangulos(_p1, p2, p3)
@@ -230,7 +228,12 @@ while _exec:
             print("No puede seleccionar el mismo punto para evitar que el que usa para buscar")
             continue
         puntosAEvitar.add(auxP)
-        pygame.draw.circle(screen, (255, 255, 255), (auxP.x * (300 / w) + 10, auxP.y * (300 / h) + 10), 2)
+
+        def actualizar_grilla():
+            dibujar_grilla()
+            pygame.draw.circle(screen, (255, 255, 255), (auxP.x * (300 / w) + 10, (h - auxP.y - 1) * (300 / h) + 10), 2)
+
+        actualizar_grilla()
         pygame.display.flip()
         res = input("Continuar? S/N: ")
 
@@ -244,6 +247,5 @@ while _exec:
 
     _doesExec = input("Continuar? S/N: ")
     if _doesExec.capitalize() != "S":
-        _exec = False
-
-pygame.quit()
+        pygame.quit()
+        sys.exit()
