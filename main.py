@@ -79,6 +79,14 @@ while True:
             for _h in range(h):
                 pygame.draw.circle(screen, (0, 0, 0), (_w * (300 / w) + 10, _h * (300 / h) + 10), 2)
 
+
+    def actualizar_grilla():
+        dibujar_grilla()
+        if len(puntosAEvitar) > 0:
+            for __p in puntosAEvitar:
+                pygame.draw.circle(screen, (255, 255, 255), (__p.x * (300 / w) + 10, ((h - __p.y - 1) * (300 / h) + 10)), 2)
+        pygame.display.flip()
+
     def lineas_para_triangulo(_p1, _p2, c):
         while c > len(colores) - 1:
             c = c - len(colores) - 1
@@ -161,7 +169,7 @@ while True:
                                 pygame.time.wait(1000)
                                 screen.fill((255, 255, 255))
 
-                                pygame.display.flip()
+                                actualizar_grilla()
                                 _setTriangulos.add(__t)
 
                         del p2
@@ -181,7 +189,7 @@ while True:
     while res.capitalize() == "S":
         auxP = Punto(int(input("coordenada x del punto ")), int(input("coordenada y del punto ")))
         puntosAEvitar.add(auxP)
-        pygame.display.flip()
+        actualizar_grilla()
         res = input("Continuar? S/N: ")
 
     # Buscar triangulos en toda la grilla
