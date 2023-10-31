@@ -99,8 +99,8 @@ while True:
     dibujar_grilla()
     pygame.display.update()
 
-    # Calculos de pendiente y angulos
 
+    # Calculos de pendiente y angulos
 
     def calcular_pendiente(_p1, _p2):
         if (_p2.x - _p1.x) == 0:
@@ -141,13 +141,38 @@ while True:
             return 90
         else:
             ang = math.degrees(math.atan((m2 - m1) / (1 + m2 * m1)))
+            print(m1, m2)
+            if ang < 0:
+                ang *= -1
+            return ang
+
+
+    def calcular_angulos_v2(m1, m2):
+        if type(m1) == str and m2 == 0 or -0:
+            return 90
+        elif type(m2) == str and m1 == 0 or -0:
+            return 90
+        elif type(m1) == str and type(m2) != str:
+            ang = math.degrees(math.atan(m2))
+            ang = 90 - ang
+            return ang
+        elif type(m2) == str and type(m1) != str:
+            ang = math.degrees(math.atan(-m1))
+            ang = 90 - ang
+            return ang
+        elif type(m1) == str and type(m2) == str:
+            return 0
+        elif (1 + m2 * m1) == 0:
+            return 90
+        else:
+            ang = math.degrees(math.atan((m2 - m1) / (1 + m2 * m1)))
+            print(m1, m2)
             if ang < 0:
                 ang += 180
             return ang
 
 
     # Funcion principal
-
 
     def buscar_todos_los_triangulos(p1, _h, _w, _setTriangulos, listaPuntosEvitar):
         color = 0
@@ -167,43 +192,45 @@ while True:
                         mAC = calcular_pendiente(p1, p2)
                         mBC = calcular_pendiente(p2, p3)
 
-                        aX = calcular_angulos(mAB, mAC)
-                        aY = calcular_angulos(mBC, mAB)
-                        aZ = calcular_angulos(mAC, mBC)
+                        for i in range(2):
 
-                        listaAngulos = [aX, aY, aZ]
-                        print(listaAngulos)
+                            if i == 0:
+                                aX = calcular_angulos(mAB, mAC)
+                                aY = calcular_angulos(mBC, mAB)
+                                aZ = calcular_angulos(mAC, mBC)
+                                listaAngulos = [aX, aY, aZ]
 
-                        listaAngulos = verificar_angulos(listaAngulos)
+                            elif i == 1:
+                                aX = calcular_angulos_v2(mAB, mAC)
+                                aY = calcular_angulos_v2(mBC, mAB)
+                                aZ = calcular_angulos_v2(mAC, mBC)
+                                listaAngulos = [aX, aY, aZ]
 
-                        if abs(sum(listaAngulos)) == 180 and listaAngulos.count(0) == 0:
-                            __t = Triangulo(p1, p2, p3)
-                            flag = triangulos_repetidos(_setTriangulos, __t)
-                            if flag:
-                                del __t
-                            else:
-                                print(p1, p2, p3)
-                                print(listaAngulos)
-                                print("the")
+                            listaAngulos = verificar_angulos(listaAngulos)
 
-                                color += 1
-                                lineas_para_triangulo(p1, p2, color)
-                                lineas_para_triangulo(p1, p3, color)
-                                lineas_para_triangulo(p2, p3, color)
-                                pygame.display.flip()
+                            if abs(sum(listaAngulos)) == 180 and listaAngulos.count(0) == 0:
+                                __t = Triangulo(p1, p2, p3)
+                                flag = triangulos_repetidos(_setTriangulos, __t)
+                                if flag:
+                                    del __t
+                                else:
+                                    color += 1
+                                    lineas_para_triangulo(p1, p2, color)
+                                    lineas_para_triangulo(p1, p3, color)
+                                    lineas_para_triangulo(p2, p3, color)
+                                    pygame.display.flip()
 
-                                pygame.time.wait(250)
-                                screen.fill((255, 255, 255))
+                                    pygame.time.wait(250)
+                                    screen.fill((255, 255, 255))
 
-                                actualizar_grilla()
-                                _setTriangulos.add(__t)
+                                    actualizar_grilla()
+                                    _setTriangulos.add(__t)
 
                         del p2
                         del p3
 
 
     # Evitar triangulos repetidos
-
 
     def triangulos_repetidos(_setTriangulos: set, ___t: Triangulo):
         for _t in _setTriangulos:
