@@ -4,7 +4,7 @@ import pygame
 
 pygame.init()
 
-size = width, height = 300, 300
+size = width, height = 500, 500
 screen = pygame.display.set_mode(size)
 white = (255, 255, 255)
 black = (12, 12, 12)
@@ -77,31 +77,40 @@ while True:
     def dibujar_grilla():
         for _w in range(w):
             for _h in range(h):
-                pygame.draw.circle(screen, (0, 0, 0), (_w * (300 / w) + 10, _h * (300 / h) + 10), 2)
+                pygame.draw.circle(screen, (0, 0, 0), (_w * (500 / w) + 10, _h * (500 / h) + 10), 2)
 
 
     def actualizar_grilla():
         dibujar_grilla()
         if len(puntosAEvitar) > 0:
             for __p in puntosAEvitar:
-                pygame.draw.circle(screen, (255, 255, 255), (__p.x * (300 / w) + 10, ((h - __p.y - 1) * (300 / h) + 10)), 2)
+                pygame.draw.circle(screen, (255, 255, 255),
+                                   (__p.x * (500 / w) + 10, ((h - __p.y - 1) * (500 / h) + 10)), 2)
         pygame.display.flip()
+
 
     def lineas_para_triangulo(_p1, _p2, c):
         while c > len(colores) - 1:
             c = c - len(colores) - 1
-        pygame.draw.line(screen, colores[c], (_p1.x * (300 / w) + 10, (h - _p1.y - 1) * (300 / h) + 10),
-                         (_p2.x * (300 / w) + 10, (h - _p2.y - 1) * (300 / h) + 10), 2)
+        pygame.draw.line(screen, colores[c], (_p1.x * (500 / w) + 10, (h - _p1.y - 1) * (500 / h) + 10),
+                         (_p2.x * (500 / w) + 10, (h - _p2.y - 1) * (500 / h) + 10), 2)
+
 
     dibujar_grilla()
     pygame.display.update()
 
     # Calculos de pendiente y angulos
 
+
     def calcular_pendiente(_p1, _p2):
         if (_p2.x - _p1.x) == 0:
             return "Pendiente indefinida"
-        return (_p2.y - _p1.y) / (_p2.x - _p1.x)
+        else:
+            pendiente = (_p2.y - _p1.y) / (_p2.x - _p1.x)
+            if pendiente == -0:
+                pendiente = 0
+        return pendiente
+
 
     def verificar_angulos(_listaAngulos):
         if _listaAngulos[0] == 0 and _listaAngulos[1] != 0 and _listaAngulos[2] != 0:
@@ -112,12 +121,21 @@ while True:
             _listaAngulos[2] = 180 - (_listaAngulos[0] + _listaAngulos[1])
         return _listaAngulos
 
+
     def calcular_angulos(m1, m2):
         if type(m1) == str and m2 == 0 or -0:
             return 90
         elif type(m2) == str and m1 == 0 or -0:
             return 90
-        elif type(m1) == str or type(m2) == str:
+        elif type(m1) == str and type(m2) != str:
+            ang = math.degrees(math.atan(m2))
+            ang = 90 - ang
+            return ang
+        elif type(m2) == str and type(m1) != str:
+            ang = math.degrees(math.atan(-m1))
+            ang = 90 - ang
+            return ang
+        elif type(m1) == str and type(m2) == str:
             return 0
         elif (1 + m2 * m1) == 0:
             return 90
@@ -127,7 +145,9 @@ while True:
                 ang += 180
             return ang
 
+
     # Funcion principal
+
 
     def buscar_todos_los_triangulos(p1, _h, _w, _setTriangulos, listaPuntosEvitar):
         color = 0
@@ -152,21 +172,27 @@ while True:
                         aZ = calcular_angulos(mAC, mBC)
 
                         listaAngulos = [aX, aY, aZ]
+                        print(listaAngulos)
+
                         listaAngulos = verificar_angulos(listaAngulos)
 
-                        if listaAngulos.count(90) == 1 and listaAngulos.count(0) == 0:
+                        if abs(sum(listaAngulos)) == 180 and listaAngulos.count(0) == 0:
                             __t = Triangulo(p1, p2, p3)
                             flag = triangulos_repetidos(_setTriangulos, __t)
                             if flag:
                                 del __t
                             else:
+                                print(p1, p2, p3)
+                                print(listaAngulos)
+                                print("the")
+
                                 color += 1
                                 lineas_para_triangulo(p1, p2, color)
                                 lineas_para_triangulo(p1, p3, color)
                                 lineas_para_triangulo(p2, p3, color)
                                 pygame.display.flip()
 
-                                pygame.time.wait(1000)
+                                pygame.time.wait(250)
                                 screen.fill((255, 255, 255))
 
                                 actualizar_grilla()
@@ -175,12 +201,16 @@ while True:
                         del p2
                         del p3
 
+
     # Evitar triangulos repetidos
+
+
     def triangulos_repetidos(_setTriangulos: set, ___t: Triangulo):
         for _t in _setTriangulos:
             if _t.puntos == ___t.puntos:
                 return True
         return False
+
 
     # Evitar puntos en grilla
 
