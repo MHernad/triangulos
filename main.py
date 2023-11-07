@@ -65,8 +65,15 @@ while True:
 
     # Crea y muestra la grilla
 
-    w = int(input("width: "))
-    h = int(input("height: "))
+    f = open("config.txt", "r")
+    line = f.readline()
+    if len(line) == 0 or line.split(",")[0].isnumeric() is False or line.split(",")[1].strip().isnumeric() is False:
+        print("Verifique que el documento de configuración sea correcto.")
+        sys.exit()
+    else:
+        w = int(line.split(",")[0])
+        h = int(line.split(",")[1].strip())
+    f.close()
     grid = []
     dots_h = []
     dots = []
@@ -77,7 +84,7 @@ while True:
     def dibujar_grilla():
         for _w in range(w):
             for _h in range(h):
-                pygame.draw.circle(screen, (0, 0, 0), (_w * (500 / w) + 10, _h * (500 / h) + 10), 2)
+                pygame.draw.circle(screen, (0, 0, 0), (_w * (500 / w) + 10, _h * (500 / h) + 10), 1)
 
 
     def actualizar_grilla():
@@ -98,7 +105,6 @@ while True:
 
     dibujar_grilla()
     pygame.display.update()
-
 
     # Calculos de pendiente y angulos
 
@@ -141,7 +147,6 @@ while True:
             return 90
         else:
             ang = math.degrees(math.atan((m2 - m1) / (1 + m2 * m1)))
-            print(m1, m2)
             if ang < 0:
                 ang *= -1
             return ang
@@ -166,11 +171,9 @@ while True:
             return 90
         else:
             ang = math.degrees(math.atan((m2 - m1) / (1 + m2 * m1)))
-            print(m1, m2)
             if ang < 0:
                 ang += 180
             return ang
-
 
     # Funcion principal
 
@@ -232,6 +235,7 @@ while True:
 
     # Evitar triangulos repetidos
 
+
     def triangulos_repetidos(_setTriangulos: set, ___t: Triangulo):
         for _t in _setTriangulos:
             if _t.puntos == ___t.puntos:
@@ -241,13 +245,19 @@ while True:
 
     # Evitar puntos en grilla
 
-    res = input("Evitar puntos en la grilla? S/N: ")
-
-    while res.capitalize() == "S":
-        auxP = Punto(int(input("coordenada x del punto ")), int(input("coordenada y del punto ")))
-        puntosAEvitar.add(auxP)
-        actualizar_grilla()
-        res = input("Continuar? S/N: ")
+    f = open("config.txt", "r")
+    size = len(f.readlines())-1
+    f.close()
+    f = open("config.txt", "r")
+    f.readline()
+    for _i in range(size):
+        line = f.readline()
+        if len(line) == 0 or line.split(",")[0].isnumeric() is False or line.split(",")[1].strip().isnumeric() is False:
+            print("Verifique que el documento de configuración sea correcto.")
+        else:
+            auxP = Punto(int(line.split(",")[0]), int(line.split(",")[1].strip()))
+            puntosAEvitar.add(auxP)
+    actualizar_grilla()
 
     # Buscar triangulos en toda la grilla
 
