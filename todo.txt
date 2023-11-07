@@ -1,4 +1,0 @@
-Para hacer:
-	- Input en pantalla
-	- Grilla con espaciado dinamico
-	- Arreglar el grafico de los puntos a evitar
